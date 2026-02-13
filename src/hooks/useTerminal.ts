@@ -176,11 +176,10 @@ export function useTerminal() {
             }
         };
 
-        const restoreSession = () => {
+        const printWelcome = () => {
             const term = xtermRef.current;
             if (!term) return;
 
-            aliasesRef.current = loadAliases();
             const aliasCount = Object.keys(aliasesRef.current).length;
 
             term.writeln(`${bold(green('VANGUARD TERMINAL [Version 3.0.0]'))}`);
@@ -192,9 +191,15 @@ export function useTerminal() {
 
             term.writeln(`Type ${cyan('help')} to list available commands.\r\n`);
             term.write('$ ');
+        };
 
+        const restoreSession = () => {
+            aliasesRef.current = loadAliases();
+            // Load monitors
             const savedMonitors = loadMonitoredUrls();
             savedMonitors.forEach(url => startMonitor(url));
+
+            printWelcome();
         };
 
         // --- 2. INIT LOGIC ---
@@ -243,7 +248,7 @@ export function useTerminal() {
 
                     if (result.type === 'clear') {
                         term.clear();
-                        term.write('$ ');
+                        printWelcome();
                     } else if (result.type === 'async') {
                         // Re-resolve for execution
                         const parts = command.trim().split(/\s+/);
@@ -269,7 +274,11 @@ export function useTerminal() {
                             saveAliases(aliasesRef.current);
                             term.writeln(green(`Alias removed: ${bold(key)}`));
                         } else {
-                            if (result.content) term.writeln(result.content);
+                            if (result.content) {
+                                // Fix staircase effect by normalizing newlines
+                                const displayContent = result.content.replace(/\n/g, '\r\n');
+                                term.writeln(displayContent);
+                            }
                         }
                         term.write('$ ');
                     } else {

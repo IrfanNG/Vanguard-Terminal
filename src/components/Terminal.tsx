@@ -16,15 +16,18 @@ export default function TerminalComponent() {
             />
 
             {/* Status Bar */}
-            <div className="h-6 w-full bg-[#111] border-t border-[#333] flex items-center justify-between px-2 text-xs font-mono text-[#666]">
-                <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${statusInfo.monitorCount > 0 ? 'bg-green-500 animate-pulse' : 'bg-[#333]'}`}></span>
-                    <span className="text-[#00ff41]">
-                        {statusInfo.monitorCount} active monitor{statusInfo.monitorCount !== 1 ? 's' : ''}
-                    </span>
+            <div className="h-8 w-full bg-[#1a1a1a] border-t border-[#333] flex items-center justify-between px-4 text-sm font-mono text-[#888]">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${statusInfo.monitorCount > 0 ? 'bg-green-500 animate-pulse' : 'bg-[#333]'}`}></span>
+                        <span className={statusInfo.monitorCount > 0 ? "text-[#00ff41]" : ""}>
+                            {statusInfo.monitorCount} active monitor{statusInfo.monitorCount !== 1 ? 's' : ''}
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    {statusInfo.time}
+                <div className="flex items-center gap-2">
+                    <span className="text-[#444]">|</span>
+                    <span>{statusInfo.time}</span>
                 </div>
             </div>
         </div>
