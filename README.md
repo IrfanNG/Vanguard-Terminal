@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Vanguard Terminal
+A high-performance, web-based systems monitoring CLI built for the 2026 developer ecosystem.
 
-## Getting Started
+Vanguard Terminal is a minimalist, keyboard-driven dashboard that bridges the gap between traditional GUIs and professional command-line interfaces. It provides real-time website health audits, performance tracking, and persistent system monitoring through a clean, obsidian-themed terminal environment.
 
-First, run the development server:
+🚀 Features
+Real-Time Performance Audits: Integrates with Google PageSpeed Insights to provide LCP, CLS, and SEO metrics directly in the terminal.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Active Monitoring (Daemon Mode): Background processes that ping URLs every 60 seconds to track uptime and response latency.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Persistent Environment: Custom aliases and monitoring settings are saved via LocalStorage, ensuring session recovery on refresh.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Advanced CLI UX: Supports command history (Up/Down arrows), ANSI color-coded outputs, and interactive loaders.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+SEO & Security Checks: Built-in commands to verify SSL certificates and metadata health.
 
-## Learn More
+🛠️ Technical Stack
+Framework: Next.js 16 (App Router)
 
-To learn more about Next.js, take a look at the following resources:
+Terminal Engine: Xterm.js
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Language: TypeScript
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Styling: Tailwind CSS (Minimalist Obsidian Theme)
 
-## Deploy on Vercel
+APIs: Google PageSpeed Insights, custom Next.js API Routes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+🏗️ Architecture & Challenges
+Building a terminal in a modern web framework presents unique engineering hurdles. Here is how I solved them:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. The SSR Hydration Bridge
+Xterm.js is a browser-only library that requires access to the window and document objects.
+
+Solution: Implemented Dynamic Imports with ssr: false to ensure the terminal only initializes on the client-side, preventing Next.js hydration mismatches.
+
+2. Memory-Safe Background Tasks
+Managing background "monitoring" intervals in a React environment can easily lead to memory leaks and duplicate processes.
+
+Solution: Developed a custom useTerminal hook that utilizes the useEffect cleanup pattern. All active setInterval monitors are tracked in a registry and destroyed when the component unmounts.
+
+3. API Security
+To protect sensitive API keys (like Google PageSpeed), I avoided all client-side fetching for third-party tools.
+
+Solution: Architected a Next.js API Gateway. The terminal sends requests to /api/scan, which handles the authenticated request server-side, keeping the ENV variables hidden from the browser.
+
+Command,Description
+neofetch,Display system information and the Vanguard Shield.
+scan [url],Run a live performance and SEO audit on a website.
+monitor [url],Start a real-time heartbeat monitor (60s interval).
+alias [key]=[url],"Map a short name to a long URL (e.g., alias work=https://mysite.com)."
+clear,Wipe the terminal buffer.
+help,View all available system commands.
