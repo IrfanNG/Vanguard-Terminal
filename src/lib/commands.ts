@@ -1,5 +1,7 @@
+import { green, red, cyan, bold, RESET } from './ansi';
+
 export type CommandResult = {
-  type: 'text' | 'clear' | 'error';
+  type: 'text' | 'clear' | 'error' | 'async';
   content?: string;
 };
 
@@ -13,11 +15,13 @@ export function executeCommand(input: string): CommandResult {
     case 'help':
       return {
         type: 'text',
-        content: `AVAILABLE COMMANDS:
+        content: `
+${bold('AVAILABLE COMMANDS:')}
 ------------------
-help        List available commands
-clear       Clear terminal buffer
-scan [url]  Perform mock site health scan
+${cyan('help')}        List available commands
+${cyan('clear')}       Clear terminal buffer
+${cyan('scan [url]')}  Analyze site performance & SEO
+${cyan('neofetch')}    Display system information
 `,
       };
     case 'clear':
@@ -27,12 +31,46 @@ scan [url]  Perform mock site health scan
       if (!url) {
         return {
           type: 'error',
-          content: 'USAGE: scan [url]',
+          content: `USAGE: scan [url]`,
         };
       }
       return {
+        type: 'async',
+        content: url,
+      };
+    case 'neofetch':
+      const logo = [
+        `      /\\      `,
+        `     /  \\     `,
+        `    / ⬡  \\    `,
+        `   /______\\   `,
+        `   |      |   `,
+        `   |  \\/  |   `,
+        `   |______|   `
+      ];
+
+      const stats = [
+        `${cyan('OS')}:       VanguardOS v2.0`,
+        `${cyan('Shell')}:    V-SH 1.0`,
+        `${cyan('Kernel')}:   Obsidian 0.10.0`,
+        `${cyan('Status')}:   ${green('● Online')}`,
+        `${cyan('Uptime')}:   ${green('██████████')} 99.9%`,
+        `${cyan('Terminal')}: Xterm.js 5.3`
+      ];
+
+      // Combine logo and stats side-by-side
+      const lines = [];
+      const maxRows = Math.max(logo.length, stats.length);
+
+      for (let i = 0; i < maxRows; i++) {
+        const logoLine = logo[i] || ' '.repeat(14);
+        const statsLine = stats[i] || '';
+        lines.push(`${logoLine}   ${statsLine}`);
+      }
+
+      return {
         type: 'text',
-        content: `Initializing Vanguard Scan on ${url}...\r\n[SUCCESS] Site is healthy.`,
+        content: `\r\n${lines.join('\r\n')}\r\n`,
       };
     default:
       return {
